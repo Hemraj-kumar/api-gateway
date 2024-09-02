@@ -1,4 +1,4 @@
-package filters;
+package dev.hemraj.api_gateway.filters;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;

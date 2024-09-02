@@ -1,6 +1,6 @@
-package Configuration;
+package dev.hemraj.api_gateway.Configuration;
 
-import filters.CustomFilter;
+import dev.hemraj.api_gateway.filters.CustomFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
