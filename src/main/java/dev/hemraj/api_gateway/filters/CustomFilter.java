@@ -2,9 +2,10 @@ package dev.hemraj.api_gateway.filters;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 @Component
 public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Config> {
@@ -14,23 +15,22 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
     @Override
     public GatewayFilter apply(Config config) {
        return ((exchange, chain) -> {
-           String requestHeaderName = config.getRequestHeaderName();
-           String responseHeaderName = config.getResponseHeaderName();
-           String responseHeaderValue = config.getResponseHeaderValue();
+           ServerHttpRequest request = exchange.getRequest();
+           HttpHeaders headers = request.getHeaders();
 
-           if(!exchange.getRequest().getHeaders().containsKey(requestHeaderName)){
+           if(!headers.containsKey(config.getRequestHeaderName())){
                exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
                return exchange.getResponse().setComplete();
            }
-           return chain.filter(exchange).then(Mono.fromRunnable(()->{
-               exchange.getResponse().getHeaders().add(responseHeaderName,responseHeaderValue);
-           }));
+           ServerHttpRequest modifiedRequest = request.mutate()
+                   .header(config.getRequestHeaderName(),headers.getFirst(config.getRequestHeaderName())).build();
+
+           return chain.filter(exchange.mutate().request(modifiedRequest).build());
        });
     }
     public static class Config{
         private String requestHeaderName;
-        private String responseHeaderValue;
-        private String responseHeaderName;
+        private String requestHeaderValue;
 
         public String getRequestHeaderName() {
             return requestHeaderName;
@@ -40,20 +40,11 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
             this.requestHeaderName = requestHeaderName;
         }
 
-        public String getResponseHeaderName() {
-            return responseHeaderName;
+        public void setRequestHeaderValue(String requestHeaderValue){
+            this.requestHeaderValue = requestHeaderValue;
         }
-
-        public void setResponseHeaderName(String responseHeaderName) {
-            this.responseHeaderName = responseHeaderName;
-        }
-
-        public String getResponseHeaderValue() {
-            return responseHeaderValue;
-        }
-
-        public void setResponseHeaderValue(String responseHeaderValue) {
-            this.responseHeaderValue = responseHeaderValue;
+        public String getRequestHeaderValue(){
+            return requestHeaderValue;
         }
 
     }

@@ -16,3 +16,4 @@ spring:
                 requestHeaderName: X-Request-Example
                 responseHeaderName: X-Response-Example
                 responseHeaderValue: Gateway-Response
+                requestHeaderValue: Gateway-request-value

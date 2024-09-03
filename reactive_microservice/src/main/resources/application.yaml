@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: reactive-microservice
+server:
+  port: 4000

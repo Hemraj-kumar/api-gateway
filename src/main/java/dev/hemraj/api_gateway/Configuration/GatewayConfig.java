@@ -10,9 +10,12 @@ import org.springframework.context.annotation.Configuration;
 public class GatewayConfig {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder, CustomFilter filter){
+        CustomFilter.Config filterConfig = new CustomFilter.Config();
+        filterConfig.setRequestHeaderName("X-Request-Example");
+
         return builder.routes()
                 .route("example_route", r -> r.path("/api/public/**")
-                        .filters(f -> f.filter(filter.apply(new CustomFilter.Config())))
+                        .filters(f -> f.filter(filter.apply(filterConfig)))
                         .uri("http://localhost:4000"))
                 .build();
     }
